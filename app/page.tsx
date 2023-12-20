@@ -3,35 +3,49 @@
 import React, { useEffect, useState } from 'react';
 import { StatusWindow } from './StatusWindow/StatusWindow';
 
-export default function Home() {
+interface User {
+  id: string;
+  date_created: string | null,
+  date_updated: string | null,
+  hp: number;
+  username: string;
+}
+interface Data {
+  data: User[]
+}
 
-  const [requestResult, setRequestResult] = useState({
+export default function Home() {
+  const [requestResult, setRequestResult] = useState<Data>({
     "data": [
       {
-        "user_id": "a",
+        "id": "a",
         "date_created": null,
         "date_updated": null,
-        "HP": 100,
+        "hp": 100,
         "username": "NoName1"
       },
       {
-        "user_id": "b",
+        "id": "b",
         "date_created": null,
         "date_updated": null,
-        "HP": 50,
+        "hp": 50,
         "username": "NoName2"
       },
       {
-        "user_id": "c",
+        "id": "c",
         "date_created": null,
         "date_updated": null,
-        "HP": 10,
+        "hp": 10,
         "username": "NoName3"
       }
     ]
   });
 
   useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = () => {
     let myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
 
@@ -42,20 +56,21 @@ export default function Home() {
     };
 
     fetch("https://directus.mizunanari.com/items/User", requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        setRequestResult(data);
-      })
+      .then(response => response.text())
+      .then(result => setRequestResult(JSON.parse(result)))
       .catch(error => {
-        error.log('Error fetching data:', error);
+        console.log('Error fetching data:', error);
       });
-  }, []);
+  }
 
   return (
-    <div>
-      {requestResult.data.map((user) => (
-        <StatusWindow hp={user.HP} maxHp={100} username={user.username} key={user.user_id} />
-      ))}
-    </ div>
+    <div className='flex justify-center mt-20'>
+      <div className='w-80 grid justify-center'>
+        <button onClick={getData} className="mb-10 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">更新</button>
+        {requestResult.data.map((user) => (
+          <StatusWindow user={user} key={user.id} />
+        ))}
+      </ div>
+    </div>
   )
 }
