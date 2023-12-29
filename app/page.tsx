@@ -55,7 +55,9 @@ export default function Home() {
       redirect: 'follow'
     };
 
-    fetch("https://directus.mizunanari.com/items/User", requestOptions)
+    const url: string = process.env.NEXT_PUBLIC_DIRECTUS_URL + "/items/User"
+
+    fetch(url, requestOptions)
       .then(response => response.text())
       .then(result => setRequestResult(JSON.parse(result)))
       .catch(error => {
